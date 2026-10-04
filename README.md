@@ -71,6 +71,19 @@ When you pick a mode in Settings, TCL also applies a matching "Colorpaper/Einkpa
 
 **To turn the theme off**, long-press a tile and untick **"Also apply NXTPAPER theme"**. The tiles and widgets will then only switch the display mode and won't touch your theme or wallpaper.
 
+## FAQ
+
+**Can I turn off USB debugging or Developer options after granting the permission?**
+
+Yes. The `pm grant` permission is saved with the app, so it stays granted after you turn off USB debugging or Developer options, and after reboots. You only need ADB once, to grant it. You'd need to grant it again only if you:
+
+- uninstall and reinstall the app (updating to a new version keeps it), or
+- factory-reset the tablet.
+
+If you want to grant the wallpaper permissions over ADB too, do that before turning debugging off. Otherwise you can grant them later from the settings screen (long-press a tile), without ADB.
+
+To check, long-press a tile after turning debugging off. The settings screen should say **"Permission: granted ✓"**.
+
 ## Build
 
 The project builds without Gradle, using only the basic Android build tools. On Debian/Ubuntu:
