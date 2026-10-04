@@ -1,0 +1,19 @@
+# Build output
+build/
+*.apk
+*.dex
+
+# Signing keys — never commit
+*.keystore
+*.jks
+
+# Local debugging material (contains TCL proprietary APKs / device settings)
+apks/
+dumps/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

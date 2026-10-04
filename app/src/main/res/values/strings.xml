@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NXTPAPER Tiles</string>
+    <string name="tile_color">Color Paper</string>
+    <string name="tile_ink">Ink Paper</string>
+    <string name="widget_color_desc">Toggle Color Paper mode</string>
+    <string name="widget_ink_desc">Toggle Ink Paper mode</string>
+</resources>
