@@ -49,9 +49,9 @@ public final class NxtMode {
     private static final String PREFS = "prefs";
     private static final String PREF_APPLY_THEME = "apply_theme";
 
-    /** Whether to also apply TCL's NXTPAPER theme (this replaces the wallpaper). Off by default. */
+    /** Whether to also apply TCL's NXTPAPER theme, like Settings does. On by default. */
     public static boolean applyTheme(Context ctx) {
-        return ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(PREF_APPLY_THEME, false);
+        return ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(PREF_APPLY_THEME, true);
     }
 
     public static void setApplyTheme(Context ctx, boolean on) {
@@ -90,13 +90,23 @@ public final class NxtMode {
             }
         };
 
+        final int from = get(app);
         Intent i = new Intent().setComponent(new ComponentName(THEME_PKG, THEME_CLS)).setPackage(THEME_PKG);
         final ServiceConnection conn = new ServiceConnection() {
             @Override public void onServiceConnected(ComponentName name, final IBinder binder) {
                 final ServiceConnection self = this;
                 worker().post(new Runnable() {
                     @Override public void run() {
+                        // TCL's theme replaces the wallpaper (and "Regular" restores the
+                        // *default* theme wallpaper), so keep the user's own wallpaper
+                        // when leaving Regular and put it back when returning.
+                        if (from == REGULAR && style != REGULAR) {
+                            WallpaperBackup.save(app);
+                        }
                         restoreTheme(binder, style);
+                        if (style == REGULAR) {
+                            WallpaperBackup.restoreAfterTheme(app);
+                        }
                         try { app.unbindService(self); } catch (Exception ignored) {}
                         main.post(finish);
                     }
@@ -107,6 +117,19 @@ public final class NxtMode {
 
         if (!applyTheme(app)) {
             // Default: only switch the display mode; leave theme + wallpaper alone.
+            main.post(finish);
+            return;
+        }
+        if (!WallpaperBackup.canRead(app)) {
+            // Applying TCL's theme without being able to save the wallpaper would lose it.
+            Log.w(TAG, "theme option on but no wallpaper access; switching display mode only");
+            main.post(new Runnable() {
+                @Override public void run() {
+                    android.widget.Toast.makeText(app,
+                            "NXTPAPER theme skipped to protect your wallpaper. Long-press the tile to allow wallpaper access.",
+                            android.widget.Toast.LENGTH_LONG).show();
+                }
+            });
             main.post(finish);
             return;
         }
